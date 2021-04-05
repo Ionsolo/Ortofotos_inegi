@@ -1,0 +1,132 @@
+<html>
+<head>
+<title>scratch_4.pm6</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #0033b3;}
+.s1 { color: #080808;}
+.s2 { color: #4b0082;}
+.s3 { color: #8c8c8c; font-style: italic;}
+.s4 { color: #ff4500;}
+.s5 { color: #800080;}
+.s6 { color: #8b0000;}
+.s7 { color: #067d17;}
+.s8 { color: #1750eb;}
+.s9 { color: #0037a6;}
+</style>
+</head>
+<body bgcolor="#ffffff">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#c0c0c0" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+scratch_4.pm6</font>
+</center></td></tr></table>
+<pre><span class="s0">use </span><span class="s2">WWW</span><span class="s1">;</span>
+<span class="s0">use </span><span class="s2">Gumbo</span><span class="s1">;</span>
+<span class="s3">#https://www.inegi.org.mx/app/mapas/</span>
+
+<span class="s0">sub </span><span class="s4">MAIN </span><span class="s1">( </span><span class="s5">$acción</span><span class="s1">, </span><span class="s5">$objeto</span><span class="s1">, </span><span class="s2">Bool </span><span class="s1">:</span><span class="s5">$bil</span><span class="s1">, </span><span class="s2">Int </span><span class="s1">:</span><span class="s5">$año</span><span class="s1">, </span><span class="s2">Bool </span><span class="s1">:</span><span class="s5">$fuzz</span><span class="s1">, </span><span class="s2">Bool </span><span class="s1">:</span><span class="s5">$lista</span><span class="s1">, </span><span class="s2">Int </span><span class="s1">:</span><span class="s5">$escala</span><span class="s1">, </span><span class="s2">Str </span><span class="s1">:</span><span class="s5">$rango </span><span class="s1">) {</span>
+    <span class="s0">my </span><span class="s5">@noencontrados</span><span class="s1">;</span>
+    <span class="s0">my constant </span><span class="s5">$urlbase </span><span class="s6">= </span><span class="s7">'https://www.inegi.org.mx'</span><span class="s1">;</span>
+    <span class="s0">if </span><span class="s6">! </span><span class="s5">$lista </span><span class="s1">{</span>
+        <span class="s0">given </span><span class="s5">$acción </span><span class="s1">{</span>
+            <span class="s0">when </span><span class="s1">( </span><span class="s7">/descarga/ </span><span class="s1">) { </span><span class="s4">descarga urls</span><span class="s1">( </span><span class="s5">$objeto </span><span class="s6">, </span><span class="s8">0 </span><span class="s1">) }</span>
+            <span class="s0">when </span><span class="s1">( </span><span class="s7">/urls/ </span><span class="s1">) { </span><span class="s4">urls</span><span class="s1">( </span><span class="s5">$objeto </span><span class="s6">, </span><span class="s8">1 </span><span class="s1">) }</span>
+            <span class="s0">when </span><span class="s1">( </span><span class="s7">/info/ </span><span class="s1">) {}</span>
+        <span class="s1">}</span>
+    <span class="s1">} </span><span class="s0">else </span><span class="s1">{</span>
+        <span class="s0">given </span><span class="s5">$acción </span><span class="s1">{</span>
+            <span class="s0">when </span><span class="s1">( </span><span class="s7">/descarga/ </span><span class="s1">) { </span><span class="s4">descarga  filtro lista </span><span class="s5">$objeto </span><span class="s1">}</span>
+            <span class="s0">when </span><span class="s1">( </span><span class="s7">/urls/ </span><span class="s1">) { </span><span class="s4">imprimir sort filtro lista </span><span class="s5">$objeto </span><span class="s1">}</span>
+            <span class="s0">when </span><span class="s1">( </span><span class="s7">/info/ </span><span class="s1">) {}</span>
+        <span class="s1">}</span>
+    <span class="s1">}</span>
+    <span class="s0">if </span><span class="s5">@noencontrados</span><span class="s6">.</span><span class="s4">elems </span><span class="s6">&gt; </span><span class="s8">0 </span><span class="s1">{</span><span class="s0">for </span><span class="s5">@noencontrados </span><span class="s1">{</span><span class="s4">say </span><span class="s7">&quot;no se encontró </span><span class="s5">$_</span><span class="s7">&quot;</span><span class="s1">}};</span>
+    <span class="s3">#toma los elementos coincidentes y crea para cada formato hace una linea con la información</span>
+    <span class="s0">sub </span><span class="s4">duplicador</span><span class="s1">( </span><span class="s5">@coincidentes </span><span class="s1">) {</span>
+        <span class="s0">my </span><span class="s5">@resultados</span><span class="s1">;</span>
+        <span class="s0">for </span><span class="s5">@coincidentes </span><span class="s1">{</span>
+            <span class="s0">my </span><span class="s5">$escala </span><span class="s6">= </span><span class="s5">$_</span><span class="s1">&lt;</span><span class="s7">escala</span><span class="s1">&gt;</span><span class="s6">.</span><span class="s4">substr</span><span class="s1">(</span><span class="s8">2</span><span class="s1">);</span><span class="s5">$escala </span><span class="s6">~~ </span><span class="s7">s/</span><span class="s9">\s</span><span class="s7">//</span><span class="s1">;</span>
+            <span class="s0">my </span><span class="s1">( </span><span class="s2">Int </span><span class="s5">$año</span><span class="s1">, </span><span class="s2">Str </span><span class="s5">$clavecarta </span><span class="s1">) </span><span class="s6">= </span><span class="s5">$_</span><span class="s1">&lt;</span><span class="s7">edicion</span><span class="s1">&gt;</span><span class="s6">, </span><span class="s5">$_</span><span class="s1">&lt;</span><span class="s7">clvCarta</span><span class="s1">&gt;</span><span class="s6">.</span><span class="s4">uc</span><span class="s1">;</span>
+            <span class="s0">my </span><span class="s5">$formateado-parcial </span><span class="s6">= </span><span class="s4">parse-html </span><span class="s5">$_</span><span class="s1">&lt;</span><span class="s7">formatos</span><span class="s1">&gt;;</span>
+            <span class="s0">my </span><span class="s5">@urlformatos </span><span class="s6">= </span><span class="s5">$formateado-parcial</span><span class="s6">.</span><span class="s4">lookfor</span><span class="s1">( </span><span class="s7">:TAG&lt;a&gt; </span><span class="s1">);</span>
+            <span class="s4">push </span><span class="s5">@resultados </span><span class="s6">, </span><span class="s4">map </span><span class="s1">{ </span><span class="s7">&quot;</span><span class="s5">$año $escala $clavecarta </span><span class="s7">&quot; </span><span class="s6">~ </span><span class="s5">$_</span><span class="s6">.</span><span class="s4">nodes</span><span class="s1">[</span><span class="s8">0</span><span class="s1">]&lt;</span><span class="s7">alt</span><span class="s1">&gt;</span><span class="s6">.</span><span class="s4">words</span><span class="s1">[</span><span class="s8">1</span><span class="s1">] </span><span class="s6">~ </span><span class="s7">&quot; &quot; </span><span class="s6">~ </span><span class="s5">$urlbase </span><span class="s6">~ </span><span class="s5">$_</span><span class="s6">.</span><span class="s4">attribs</span><span class="s1">&lt;</span><span class="s7">href</span><span class="s1">&gt; } </span><span class="s6">, </span><span class="s5">@urlformatos</span><span class="s1">;</span>
+        <span class="s1">}</span>
+        <span class="s4">return </span><span class="s5">@resultados</span>
+    <span class="s1">}</span>
+    <span class="s3">#toma el elemento resultado de jget y extrae los elementos que coinciden con la busqueda dependiendo si está fuzz activado</span>
+    <span class="s0">sub </span><span class="s4">coincidentes</span><span class="s1">( </span><span class="s5">%listadeentrada </span><span class="s0">is </span><span class="s2">readonly</span><span class="s1">,  </span><span class="s2">Str </span><span class="s5">$objetoevaluado </span><span class="s1">) {</span>
+        <span class="s0">my </span><span class="s2">Hash </span><span class="s5">@resultados </span><span class="s6">= </span><span class="s4">grep </span><span class="s1">{ </span><span class="s6">.</span><span class="s4">defined </span><span class="s1">} </span><span class="s6">, </span><span class="s4">grep </span><span class="s1">{ </span><span class="s6">not </span><span class="s5">$_</span><span class="s1">&lt;</span><span class="s7">titulo</span><span class="s1">&gt;</span><span class="s6">.</span><span class="s4">contains</span><span class="s1">( </span><span class="s7">&quot;Modelo digital&quot; </span><span class="s1">) }</span><span class="s6">, </span><span class="s5">%listadeentrada</span><span class="s1">&lt;</span><span class="s7">mapas</span><span class="s1">&gt;</span><span class="s6">.</span><span class="s4">list</span><span class="s1">;</span>
+        <span class="s3">#map {say $_.&lt;clvCarta&gt;.uc},@resultados depura ñlos resultados</span>
+        <span class="s5">@resultados </span><span class="s6">= </span><span class="s4">grep </span><span class="s1">{</span><span class="s5">$_</span><span class="s6">.</span><span class="s1">&lt;</span><span class="s7">clvCarta</span><span class="s1">&gt;</span><span class="s6">.</span><span class="s4">uc </span><span class="s6">eq </span><span class="s5">$objetoevaluado</span><span class="s6">.</span><span class="s4">uc </span><span class="s1">}</span><span class="s6">, </span><span class="s5">@resultados</span><span class="s1">;</span>
+        <span class="s4">push </span><span class="s5">@noencontrados </span><span class="s6">, </span><span class="s5">$objetoevaluado </span><span class="s0">if </span><span class="s5">@resultados </span><span class="s6">~~ </span><span class="s2">Empty</span><span class="s1">;</span>
+        <span class="s4">return </span><span class="s5">@resultados</span>
+    <span class="s1">}</span>
+    <span class="s0">sub </span><span class="s4">filtro</span><span class="s1">( </span><span class="s5">@resultadosdeduplicador </span><span class="s1">) {</span>
+        <span class="s0">my </span><span class="s5">@resultados </span><span class="s6">= </span><span class="s5">@resultadosdeduplicador</span><span class="s1">;</span>
+        <span class="s0">if </span><span class="s1">( </span><span class="s5">$bil </span><span class="s1">) { </span><span class="s5">@resultados </span><span class="s6">= </span><span class="s4">grep </span><span class="s1">{ </span><span class="s5">$_</span><span class="s6">.</span><span class="s4">words</span><span class="s1">[</span><span class="s8">3</span><span class="s1">]</span><span class="s6">.</span><span class="s4">contains</span><span class="s1">( </span><span class="s7">&quot;bil&quot; </span><span class="s1">) } </span><span class="s6">, </span><span class="s5">@resultados </span><span class="s1">}</span>
+        <span class="s0">if </span><span class="s1">( </span><span class="s5">$año </span><span class="s1">) { </span><span class="s5">@resultados </span><span class="s6">= </span><span class="s4">grep </span><span class="s1">{ </span><span class="s5">$_</span><span class="s6">.</span><span class="s4">words</span><span class="s1">[</span><span class="s8">0</span><span class="s1">] </span><span class="s6">== </span><span class="s5">$año </span><span class="s1">} </span><span class="s6">, </span><span class="s5">@resultados </span><span class="s1">}</span>
+        <span class="s0">if </span><span class="s1">( </span><span class="s5">$escala </span><span class="s1">) { </span><span class="s5">@resultados </span><span class="s6">= </span><span class="s4">grep </span><span class="s1">{ </span><span class="s5">$_</span><span class="s6">.</span><span class="s4">words</span><span class="s1">[</span><span class="s8">1</span><span class="s1">]</span><span class="s6">.</span><span class="s4">split</span><span class="s1">( </span><span class="s7">':' </span><span class="s1">)[</span><span class="s8">1</span><span class="s1">] </span><span class="s6">== </span><span class="s5">$escala </span><span class="s1">} </span><span class="s6">, </span><span class="s5">@resultados </span><span class="s1">}</span>
+        <span class="s0">if </span><span class="s5">$rango </span><span class="s1">{</span>
+            <span class="s0">my </span><span class="s1">( </span><span class="s2">Int </span><span class="s5">$min</span><span class="s1">, </span><span class="s2">Int </span><span class="s5">$max </span><span class="s1">) </span><span class="s6">= </span><span class="s4">sort </span><span class="s5">$rango</span><span class="s6">.</span><span class="s4">split</span><span class="s1">( </span><span class="s7">/</span><span class="s1">&lt;[</span><span class="s7">:-</span><span class="s1">]&gt;</span><span class="s7">/ </span><span class="s1">);</span>
+            <span class="s5">@resultados </span><span class="s6">= </span><span class="s4">grep </span><span class="s1">{ </span><span class="s5">$_</span><span class="s6">.</span><span class="s4">words</span><span class="s1">[</span><span class="s8">0</span><span class="s1">] </span><span class="s6">&gt;= </span><span class="s5">$min </span><span class="s6">&amp;&amp; </span><span class="s5">$_</span><span class="s6">.</span><span class="s4">words</span><span class="s1">[</span><span class="s8">0</span><span class="s1">] </span><span class="s6">&lt;= </span><span class="s5">$max </span><span class="s1">} </span><span class="s6">, </span><span class="s5">@resultados</span>
+        <span class="s1">}</span>
+        <span class="s4">return </span><span class="s5">@resultados</span>
+    <span class="s1">}</span>
+    <span class="s0">sub </span><span class="s4">urls</span><span class="s1">( </span><span class="s2">Str </span><span class="s5">$objetoabuscar </span><span class="s0">is </span><span class="s2">readonly</span><span class="s1">, </span><span class="s2">Int </span><span class="s5">$imprimir </span><span class="s1">) {</span>
+        <span class="s0">my </span><span class="s5">$urlbase </span><span class="s6">= </span><span class="s7">&quot;https://www.inegi.org.mx/app/api/productos/interna_v1/mapas/lista/resultados/?enti=&amp;muni=&amp;loca=&amp;tema=260&amp;titg=&amp;esca=&amp;edic=&amp;form=&amp;busc=</span><span class="s5">$objetoabuscar</span><span class="s7">&amp;adv=false&amp;rango=&amp;sens=&amp;uedo=&amp;reso=&amp;point=&amp;tipoB=2&amp;orden=4&amp;pagi=0&amp;tama=100&amp;desc=true&amp;_=1606930592224&quot;</span><span class="s1">;</span>
+        <span class="s0">my </span><span class="s5">%resultado </span><span class="s6">= </span><span class="s4">jget </span><span class="s5">$urlbase</span><span class="s1">;</span>
+        <span class="s5">%resultado</span><span class="s6">.</span><span class="s4">keys</span><span class="s6">.</span><span class="s4">contains</span><span class="s1">( </span><span class="s7">'mapas' </span><span class="s1">) </span><span class="s6">&amp;&amp; </span><span class="s0">my </span><span class="s5">@coco </span><span class="s6">= </span><span class="s4">sort filtro duplicador coincidentes</span><span class="s1">(</span><span class="s5">%resultado </span><span class="s6">, </span><span class="s5">$objetoabuscar</span><span class="s1">);</span>
+        <span class="s0">if </span><span class="s5">$imprimir </span><span class="s1">{ </span><span class="s0">for </span><span class="s5">@coco </span><span class="s1">{ </span><span class="s4">say </span><span class="s5">$_</span><span class="s1">[</span><span class="s8">0</span><span class="s1">] } }</span>
+        <span class="s4">return </span><span class="s5">@coco</span>
+    <span class="s1">}</span>
+    <span class="s0">sub </span><span class="s4">info</span><span class="s1">( </span><span class="s5">$acción </span><span class="s1">) {</span>
+        <span class="s0">my </span><span class="s5">@urls </span><span class="s6">= </span><span class="s4">urls</span><span class="s1">( </span><span class="s5">$objeto </span><span class="s6">, </span><span class="s8">0 </span><span class="s1">);</span>
+        <span class="s0">my </span><span class="s5">$elementos </span><span class="s6">= </span><span class="s5">@urls</span><span class="s6">.</span><span class="s4">elems</span><span class="s1">;</span>
+        <span class="s0">my </span><span class="s5">$años </span><span class="s6">= </span><span class="s1">( </span><span class="s4">map </span><span class="s1">{ </span><span class="s5">$_</span><span class="s6">.</span><span class="s4">words</span><span class="s1">[</span><span class="s8">0</span><span class="s1">] } </span><span class="s6">, </span><span class="s5">@urls </span><span class="s1">)</span><span class="s6">.</span><span class="s4">sort</span><span class="s6">.</span><span class="s4">unique</span><span class="s6">.</span><span class="s4">Str</span><span class="s1">;</span>
+        <span class="s0">my </span><span class="s5">$formato </span><span class="s6">= </span><span class="s1">( </span><span class="s4">map </span><span class="s1">{ </span><span class="s5">$_</span><span class="s6">.</span><span class="s4">words</span><span class="s1">[</span><span class="s8">2</span><span class="s1">] } </span><span class="s6">, </span><span class="s5">@urls </span><span class="s1">)</span><span class="s6">.</span><span class="s4">sort</span><span class="s6">.</span><span class="s4">unique</span><span class="s6">.</span><span class="s4">Str</span><span class="s1">;</span>
+        <span class="s5">$años </span><span class="s6">~~ </span><span class="s7">s:g/</span><span class="s9">\s</span><span class="s7">/,/</span><span class="s1">;</span>
+        <span class="s5">$formato </span><span class="s6">~~ </span><span class="s7">s:g/</span><span class="s9">\s</span><span class="s7">/:/</span><span class="s1">;</span>
+        <span class="s0">my </span><span class="s5">$repeticiones </span><span class="s6">= </span><span class="s1">( </span><span class="s4">map </span><span class="s1">{ </span><span class="s5">$_</span><span class="s6">.</span><span class="s4">words</span><span class="s1">[</span><span class="s8">0</span><span class="s1">] } </span><span class="s6">, </span><span class="s5">@urls </span><span class="s1">)</span><span class="s6">.</span><span class="s4">sort</span><span class="s6">.</span><span class="s4">repeated</span><span class="s6">.</span><span class="s4">unique</span><span class="s6">.</span><span class="s4">Str</span><span class="s1">;</span>
+        <span class="s5">$repeticiones </span><span class="s6">~~ </span><span class="s7">s:g/</span><span class="s9">\s</span><span class="s7">/,/</span><span class="s1">;</span>
+        <span class="s0">my </span><span class="s5">$informe </span><span class="s6">= </span><span class="s7">&quot;Se han encontrado </span><span class="s5">$elementos </span><span class="s7">elementos en la busqueda. Los años registrados son </span><span class="s5">$años </span><span class="s7">y sus formatos son </span><span class="s5">$formato</span><span class="s7">&quot;</span><span class="s1">;</span>
+        <span class="s0">my </span><span class="s5">$informe2 </span><span class="s6">= </span><span class="s7">&quot;Los siguientes años se encuentran repetidos </span><span class="s5">$repeticiones</span><span class="s7">,posiblemente con diferente formato &quot;</span><span class="s1">;</span>
+        <span class="s0">my </span><span class="s5">$informe3 </span><span class="s6">= </span><span class="s7">&quot;para descargar un año especifico o formato active --formato y/o --año&quot;</span><span class="s1">;</span>
+        <span class="s4">say </span><span class="s5">$informe</span><span class="s1">;</span>
+        <span class="s4">say </span><span class="s5">$informe2</span><span class="s1">;</span>
+    <span class="s1">}</span>
+    <span class="s0">sub </span><span class="s4">lista</span><span class="s1">( </span><span class="s5">$objetolista </span><span class="s1">) {</span>
+        <span class="s0">my </span><span class="s5">@acumulador</span><span class="s1">;</span>
+        <span class="s0">my </span><span class="s5">@objetosabuscar </span><span class="s6">= </span><span class="s5">$objeto</span><span class="s6">.</span><span class="s4">IO</span><span class="s6">.</span><span class="s4">lines </span><span class="s0">if </span><span class="s5">$objeto</span><span class="s6">.</span><span class="s4">IO</span><span class="s6">.</span><span class="s4">e </span><span class="s6">or </span><span class="s4">die </span><span class="s7">&quot;Documento de lista no localizade&quot;</span><span class="s1">;</span>
+        <span class="s4">map </span><span class="s1">{ </span><span class="s4">push </span><span class="s5">@acumulador </span><span class="s6">, </span><span class="s5">$_</span><span class="s1">[</span><span class="s8">0</span><span class="s1">] }</span><span class="s6">, </span><span class="s4">map </span><span class="s1">{ </span><span class="s4">urls</span><span class="s1">( </span><span class="s5">$_ </span><span class="s6">, </span><span class="s8">0 </span><span class="s1">) } </span><span class="s6">, </span><span class="s5">@objetosabuscar</span><span class="s1">;</span>
+        <span class="s4">return </span><span class="s5">@acumulador</span><span class="s1">[</span><span class="s2">*</span><span class="s1">;</span><span class="s2">*</span><span class="s1">;</span><span class="s2">*</span><span class="s1">]</span>
+    <span class="s1">}</span>
+    <span class="s0">sub </span><span class="s4">imprimir</span><span class="s1">( </span><span class="s5">@resultadodelista </span><span class="s1">) {</span>
+        <span class="s0">for </span><span class="s5">@resultadodelista </span><span class="s1">{</span>
+            <span class="s4">say </span><span class="s5">$_</span><span class="s1">[</span><span class="s8">0</span><span class="s1">]</span>
+        <span class="s1">}</span>
+    <span class="s1">}</span>
+    <span class="s0">sub </span><span class="s4">nombre</span><span class="s1">( </span><span class="s5">$elementodelistadeurls </span><span class="s1">) {</span>
+        <span class="s0">my </span><span class="s5">@split </span><span class="s6">= </span><span class="s5">$elementodelistadeurls</span><span class="s6">.</span><span class="s4">words</span><span class="s1">;</span>
+        <span class="s4">return </span><span class="s5">@split</span><span class="s1">[</span><span class="s8">2</span><span class="s1">] </span><span class="s6">~ </span><span class="s7">&quot;_&quot; </span><span class="s6">~ </span><span class="s5">@split</span><span class="s1">[</span><span class="s8">0</span><span class="s1">] </span><span class="s6">~ </span><span class="s7">&quot;.zip&quot;</span>
+    <span class="s1">}</span>
+    <span class="s0">sub </span><span class="s4">descarga</span><span class="s1">( </span><span class="s5">@listadeurls </span><span class="s1">) {</span>
+        <span class="s5">@listadeurls </span><span class="s6">= </span><span class="s5">@listadeurls</span><span class="s6">.</span><span class="s4">grep</span><span class="s6">: </span><span class="s1">{</span><span class="s6">.</span><span class="s4">defined</span><span class="s1">}</span>
+        <span class="s0">if </span><span class="s1">( </span><span class="s5">@listadeurls</span><span class="s6">.</span><span class="s4">elems </span><span class="s6">== </span><span class="s8">1 </span><span class="s1">) {</span>
+            <span class="s0">my </span><span class="s5">$url </span><span class="s6">= </span><span class="s5">@listadeurls</span><span class="s1">[</span><span class="s8">0</span><span class="s1">]</span><span class="s6">.</span><span class="s4">words</span><span class="s1">[</span><span class="s8">4</span><span class="s1">];</span>
+            <span class="s0">my </span><span class="s5">$nombre </span><span class="s6">= </span><span class="s4">nombre </span><span class="s5">@listadeurls</span><span class="s1">[</span><span class="s8">0</span><span class="s1">];</span>
+            <span class="s0">my </span><span class="s5">$file </span><span class="s6">= </span><span class="s5">$nombre</span><span class="s6">.</span><span class="s4">IO</span><span class="s6">.</span><span class="s4">open </span><span class="s7">:w :createonly</span><span class="s1">;</span>
+            <span class="s4">say </span><span class="s7">&quot;comenzando descarga de </span><span class="s5">$nombre</span><span class="s7">&quot;</span><span class="s1">;</span>
+            <span class="s0">my </span><span class="s5">$descarga </span><span class="s6">= </span><span class="s4">get </span><span class="s5">$url</span><span class="s1">;</span>
+            <span class="s0">if </span><span class="s6">! </span><span class="s1">( </span><span class="s5">$descarga </span><span class="s6">~~ </span><span class="s2">Failure </span><span class="s1">) {</span>
+                <span class="s4">say </span><span class="s7">&quot;descarga terminada&quot; </span><span class="s0">if </span><span class="s5">$file</span><span class="s6">.</span><span class="s4">write</span><span class="s1">( </span><span class="s5">$descarga </span><span class="s1">) </span><span class="s6">or </span><span class="s4">say </span><span class="s7">&quot;no se puede escribir&quot;</span><span class="s1">; }</span>
+        <span class="s1">} </span><span class="s0">else </span><span class="s1">{</span>
+            <span class="s4">map </span><span class="s1">{ </span><span class="s4">descarga </span><span class="s5">$_ </span><span class="s1">} </span><span class="s6">, </span><span class="s5">@listadeurls</span>
+        <span class="s1">}</span>
+    <span class="s1">}</span>
+<span class="s1">}</span>
+<span class="s3">#find . &quot;*.bil&quot; &gt;lista</span>
+<span class="s3">#gdalbuildvrt -input_file_list lista index.vrt</span>
+<span class="s3">#rm lista</span></pre>
+</body>
+</html>
