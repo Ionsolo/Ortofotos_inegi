@@ -43,6 +43,14 @@ $ raku ortofotos_inegi --lista --año=2010 descarga lista
 #guarda los enlaces en el documento 'resultados.csv'
 $ raku ortofotos_inegi --lista --bil urls file2.csv > resultados.csv
 
+#formas más complejas de usarlo
+#usar la lista para descargar años para la misma imagen
+$ for i in $(cat file.csv); 
+	do raku ortofotos_inegi --bil año=1990 descarga $i;
+	   raku ortofotos_inegi --bil año=2010 descarga $i;
+ ;done
+
+
 ```
 
 Las acciones a implementar en el futuro son:
