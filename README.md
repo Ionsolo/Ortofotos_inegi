@@ -1,9 +1,12 @@
-# Raku_scripts
+Raku_scripts
+=============
  Algunos scripts que construí para automatizar la interacción con páginas web que contienen información geográfica.
  Usando la función de MAIN de Raku (perl6) una caracteristica del lenguaje que permite maquetar de manera rápida un utilidad para la terminal.
+
  
- 
- ## ortofotos Inegi
+
+Ortofotos Inegi
+===============
  En el primer caso la utilidad tiene como función principal la consulta de un conjunto de ortofotos en la página del inegi,
  para ello tiene 3 comandos principales:
  
@@ -25,7 +28,8 @@
   
 Usando el producto cruzado fuzz puede obtener todas las subcartas, por ejemplo si se tiene un listado de cartas 1:50000 fuzz encontrará las cartas 1:20000 para todos ellos, actualmente estoy terminando está función por que quiero encontrar una manera de no saturar el servidor del inegi por el error de algún usuario, así que se encuentra deshabilitado.
 
-##Uso
+Uso
+===
 
 ```
 #descarga
@@ -62,6 +66,18 @@ Las acciones a implementar en el futuro son:
 - Poner una guía sobre la librerías usadas
 - Cambiar la librería WWW por libcurl
 
+Dependencias
+============
+
+Esta librería depende las librerías [Gumbo](https://github.com/Skarsnik/perl6-gumbo) y [WWW](https://github.com/raku-community-modules/WWW/blob/master/README.md) de raku 
+
+```
+sudo apt-get install libgumbo-dev libssl-dev
+zef install Gumbo
+zef install WWW
+
+```
+
 ## Planet
 Creo que mejor hago un segundo repositorio para esto...
-
+Enlace a projecto de `planet`
